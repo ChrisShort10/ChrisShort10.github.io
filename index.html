@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -39,6 +40,10 @@
     </script>
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             background-color: #06090e;
             color: #e2e8f0;
@@ -47,103 +52,105 @@
             user-select: none;
             width: 100vw;
             height: 100vh;
+            margin: 0;
+            padding: 0;
         }
 
         /* 10-Foot UI TV Text Glows */
-        .glow-cyan { text-shadow: 0 0 16px rgba(0, 240, 255, 0.7); }
-        .glow-green { text-shadow: 0 0 16px rgba(0, 255, 102, 0.7); }
-        .glow-amber { text-shadow: 0 0 16px rgba(255, 183, 0, 0.7); }
+        .glow-cyan { text-shadow: 0 0 12px rgba(0, 240, 255, 0.7); }
+        .glow-green { text-shadow: 0 0 12px rgba(0, 255, 102, 0.7); }
+        .glow-amber { text-shadow: 0 0 12px rgba(255, 183, 0, 0.7); }
 
         /* FIRE TV REMOTE D-PAD FOCUS HIGHLIGHT STYLES */
         .tv-focusable {
             outline: none;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.15s ease-in-out;
         }
         .tv-focusable:focus, .tv-focusable.tv-focused {
-            transform: scale(1.03);
+            transform: scale(1.02);
             border-color: #00f0ff !important;
-            box-shadow: 0 0 25px rgba(0, 240, 255, 0.6), inset 0 0 10px rgba(0, 240, 255, 0.2);
+            box-shadow: 0 0 18px rgba(0, 240, 255, 0.7), inset 0 0 8px rgba(0, 240, 255, 0.3);
             z-index: 50;
         }
 
         /* Grid Background Pattern */
         .bg-grid-pattern {
-            background-size: 48px 48px;
+            background-size: 36px 36px;
             background-image: 
-                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
         }
 
         /* Hide scrollbars for slick TV layout */
         ::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="bg-grid-pattern p-4 lg:p-6 flex flex-col justify-between select-none">
+<body class="bg-grid-pattern p-2.5 flex flex-col justify-between h-screen w-screen overflow-hidden select-none">
 
     <!-- FIRE TV INSTRUCTION OVERLAY BANNER -->
-    <div id="tv-guide-bar" class="bg-neonCyan/10 border border-neonCyan/40 text-neonCyan px-4 py-2 rounded-xl mb-3 flex items-center justify-between text-xs font-mono">
-        <div class="flex items-center space-x-3">
-            <i class="fa-solid fa-tv text-lg"></i>
+    <div id="tv-guide-bar" class="bg-neonCyan/10 border border-neonCyan/40 text-neonCyan px-3 py-1 rounded-lg flex items-center justify-between text-[11px] font-mono shrink-0">
+        <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-tv text-sm"></i>
             <span class="font-bold">FIRE TV / SILK BROWSER OPTIMIZED:</span>
-            <span class="text-slate-300">Use Remote D-Pad (<b>▲ ▼ ◄ ►</b>) & Select button to navigate controls.</span>
+            <span class="text-slate-300">Use Remote D-Pad (<b>▲ ▼ ◄ ►</b>) & Select button to navigate.</span>
         </div>
-        <button id="btn-fullscreen" class="tv-focusable bg-neonCyan text-black font-bold font-orbitron px-3 py-1 rounded-lg text-xs hover:bg-cyan-300">
+        <button id="btn-fullscreen" class="tv-focusable bg-neonCyan text-black font-bold font-orbitron px-2.5 py-0.5 rounded text-[10px] hover:bg-cyan-300">
             <i class="fa-solid fa-expand mr-1"></i> Fullscreen
         </button>
     </div>
 
     <!-- TOP HEADER BAR: CLOCKS & QTH -->
-    <header class="grid grid-cols-12 gap-4 mb-3">
-        <!-- QTH Callsign Badge -->
-        <div class="col-span-3 bg-tvCard/90 border border-tvBorder rounded-2xl p-3 flex items-center justify-between shadow-2xl">
-            <div class="flex items-center space-x-3">
-                <div class="w-14 h-14 rounded-2xl bg-neonCyan/10 border-2 border-neonCyan/50 flex items-center justify-center text-neonCyan text-2xl font-black font-orbitron shadow-lg">
+    <header class="grid grid-cols-12 gap-2 my-1 shrink-0">
+        <!-- QTH Callsign Badge (Fixed overlap issue) -->
+        <div class="col-span-3 bg-tvCard/90 border border-tvBorder rounded-xl p-2 flex items-center justify-between shadow-xl min-w-0">
+            <div class="flex items-center space-x-2 min-w-0">
+                <div class="w-10 h-10 rounded-lg bg-neonCyan/10 border border-neonCyan/50 flex items-center justify-center text-neonCyan text-lg font-black font-orbitron shrink-0">
                     VP8
                 </div>
-                <div>
-                    <h1 class="text-xl font-black font-orbitron text-white tracking-wider">STANLEY QTH</h1>
-                    <p class="text-xs text-slate-400 font-mono">Falkland Islands • GD18e • 51.7° S</p>
+                <div class="min-w-0 leading-tight">
+                    <h1 class="text-sm font-black font-orbitron text-white truncate">STANLEY QTH</h1>
+                    <p class="text-[10px] text-slate-400 font-mono truncate">Falklands • 51.7° S</p>
                 </div>
             </div>
-            <span id="season-badge" class="px-3 py-1 rounded-full text-xs font-bold font-orbitron uppercase bg-neonAmber/20 text-neonAmber border border-neonAmber/40">
+            <span id="season-badge" class="px-2 py-0.5 rounded text-[9px] font-bold font-orbitron uppercase bg-neonAmber/20 text-neonAmber border border-neonAmber/40 shrink-0">
                 SUMMER
             </span>
         </div>
 
         <!-- HIGH-PRECISION DUAL CLOCK ENGINE -->
-        <div class="col-span-9 bg-tvCard/90 border border-tvBorder rounded-2xl p-3 shadow-2xl flex items-center justify-between">
+        <div class="col-span-9 bg-tvCard/90 border border-tvBorder rounded-xl p-1.5 shadow-xl flex items-center justify-between">
             
             <!-- FKST LOCAL TIME -->
-            <div class="flex-1 bg-tvDark border border-slate-800 px-5 py-2.5 rounded-xl mr-3 flex items-center justify-between">
+            <div class="flex-1 bg-tvDark border border-slate-800 px-3 py-1 rounded-lg mr-2 flex items-center justify-between">
                 <div>
-                    <div class="flex items-center space-x-2">
-                        <span class="w-3 h-3 rounded-full bg-neonCyan animate-ping"></span>
-                        <span class="text-xs font-bold font-orbitron text-neonCyan uppercase tracking-widest">FKST Local (UTC-3)</span>
+                    <div class="flex items-center space-x-1.5">
+                        <span class="w-2 h-2 rounded-full bg-neonCyan animate-ping"></span>
+                        <span class="text-[10px] font-bold font-orbitron text-neonCyan uppercase">FKST Local (UTC-3)</span>
                     </div>
-                    <div class="text-3xl font-black font-mono text-white glow-cyan mt-0.5" id="clock-fkst">
-                        00:00:00.<span class="text-xl text-neonCyan/70">000</span>
+                    <div class="text-xl font-black font-mono text-white glow-cyan" id="clock-fkst">
+                        00:00:00.<span class="text-sm text-neonCyan/70">000</span>
                     </div>
                 </div>
-                <div class="text-right text-xs font-mono">
+                <div class="text-right text-[10px] font-mono">
                     <div id="date-fkst" class="font-bold text-slate-200">2026-10-30</div>
-                    <div id="solar-phase" class="text-neonAmber font-bold mt-0.5">Daylight Phase</div>
+                    <div id="solar-phase" class="text-neonAmber font-bold">Daylight Phase</div>
                 </div>
             </div>
 
             <!-- UTC TIME -->
-            <div class="flex-1 bg-tvDark border border-slate-800 px-5 py-2.5 rounded-xl flex items-center justify-between">
+            <div class="flex-1 bg-tvDark border border-slate-800 px-3 py-1 rounded-lg flex items-center justify-between">
                 <div>
-                    <div class="flex items-center space-x-2">
-                        <span class="w-3 h-3 rounded-full bg-neonGreen"></span>
-                        <span class="text-xs font-bold font-orbitron text-neonGreen uppercase tracking-widest">UTC Time</span>
+                    <div class="flex items-center space-x-1.5">
+                        <span class="w-2 h-2 rounded-full bg-neonGreen"></span>
+                        <span class="text-[10px] font-bold font-orbitron text-neonGreen uppercase">UTC Time</span>
                     </div>
-                    <div class="text-3xl font-black font-mono text-white glow-green mt-0.5" id="clock-utc">
-                        00:00:00.<span class="text-xl text-neonGreen/70">000</span>
+                    <div class="text-xl font-black font-mono text-white glow-green" id="clock-utc">
+                        00:00:00.<span class="text-sm text-neonGreen/70">000</span>
                     </div>
                 </div>
-                <div class="text-right text-xs font-mono">
+                <div class="text-right text-[10px] font-mono">
                     <div id="date-utc" class="font-bold text-slate-200">2026-10-30</div>
-                    <div class="text-slate-400 mt-0.5">ZULU TIME</div>
+                    <div class="text-slate-400">ZULU TIME</div>
                 </div>
             </div>
 
@@ -151,188 +158,187 @@
     </header>
 
     <!-- SOLAR INDICES BANNER -->
-    <section class="grid grid-cols-6 gap-3 mb-3">
-        <div class="bg-tvCard border border-tvBorder p-2.5 rounded-xl flex flex-col justify-between">
-            <span class="text-[11px] font-bold text-slate-400 font-orbitron">SFI (SOLAR FLUX)</span>
-            <div class="flex items-baseline justify-between mt-1">
-                <span id="val-sfi" class="text-2xl font-black text-neonCyan font-mono">168</span>
-                <span class="text-xs text-neonGreen font-semibold"><i class="fa-solid fa-arrow-up"></i> High</span>
+    <section class="grid grid-cols-6 gap-2 my-1 shrink-0">
+        <div class="bg-tvCard border border-tvBorder px-2 py-1.5 rounded-lg flex flex-col justify-between">
+            <span class="text-[9px] font-bold text-slate-400 font-orbitron">SFI (SOLAR FLUX)</span>
+            <div class="flex items-baseline justify-between">
+                <span id="val-sfi" class="text-lg font-black text-neonCyan font-mono">168</span>
+                <span class="text-[9px] text-neonGreen font-semibold"><i class="fa-solid fa-arrow-up"></i> High</span>
             </div>
-            <div class="w-full bg-slate-800 h-1.5 rounded-full mt-1.5 overflow-hidden">
+            <div class="w-full bg-slate-800 h-1 rounded-full mt-0.5 overflow-hidden">
                 <div class="bg-neonCyan h-full" style="width: 78%;"></div>
             </div>
         </div>
 
-        <div class="bg-tvCard border border-tvBorder p-2.5 rounded-xl flex flex-col justify-between">
-            <span class="text-[11px] font-bold text-slate-400 font-orbitron">SUNSPOT NO. (SSN)</span>
-            <div class="flex items-baseline justify-between mt-1">
-                <span id="val-ssn" class="text-2xl font-black text-neonAmber font-mono">134</span>
-                <span class="text-xs text-neonAmber font-semibold">Active</span>
+        <div class="bg-tvCard border border-tvBorder px-2 py-1.5 rounded-lg flex flex-col justify-between">
+            <span class="text-[9px] font-bold text-slate-400 font-orbitron">SUNSPOT (SSN)</span>
+            <div class="flex items-baseline justify-between">
+                <span id="val-ssn" class="text-lg font-black text-neonAmber font-mono">134</span>
+                <span class="text-[9px] text-neonAmber font-semibold">Active</span>
             </div>
-            <div class="w-full bg-slate-800 h-1.5 rounded-full mt-1.5 overflow-hidden">
+            <div class="w-full bg-slate-800 h-1 rounded-full mt-0.5 overflow-hidden">
                 <div class="bg-neonAmber h-full" style="width: 68%;"></div>
             </div>
         </div>
 
-        <div class="bg-tvCard border border-tvBorder p-2.5 rounded-xl flex flex-col justify-between">
-            <span class="text-[11px] font-bold text-slate-400 font-orbitron">A-INDEX</span>
-            <div class="flex items-baseline justify-between mt-1">
-                <span id="val-aindex" class="text-2xl font-black text-neonGreen font-mono">05</span>
-                <span class="text-xs text-neonGreen font-semibold">Quiet</span>
+        <div class="bg-tvCard border border-tvBorder px-2 py-1.5 rounded-lg flex flex-col justify-between">
+            <span class="text-[9px] font-bold text-slate-400 font-orbitron">A-INDEX</span>
+            <div class="flex items-baseline justify-between">
+                <span id="val-aindex" class="text-lg font-black text-neonGreen font-mono">05</span>
+                <span class="text-[9px] text-neonGreen font-semibold">Quiet</span>
             </div>
-            <div class="w-full bg-slate-800 h-1.5 rounded-full mt-1.5 overflow-hidden">
+            <div class="w-full bg-slate-800 h-1 rounded-full mt-0.5 overflow-hidden">
                 <div class="bg-neonGreen h-full" style="width: 18%;"></div>
             </div>
         </div>
 
-        <div class="bg-tvCard border border-tvBorder p-2.5 rounded-xl flex flex-col justify-between">
-            <span class="text-[11px] font-bold text-slate-400 font-orbitron">K-INDEX</span>
-            <div class="flex items-baseline justify-between mt-1">
-                <span id="val-kindex" class="text-2xl font-black text-neonGreen font-mono">1</span>
-                <span class="text-xs text-neonGreen font-semibold">Stable</span>
+        <div class="bg-tvCard border border-tvBorder px-2 py-1.5 rounded-lg flex flex-col justify-between">
+            <span class="text-[9px] font-bold text-slate-400 font-orbitron">K-INDEX</span>
+            <div class="flex items-baseline justify-between">
+                <span id="val-kindex" class="text-lg font-black text-neonGreen font-mono">1</span>
+                <span class="text-[9px] text-neonGreen font-semibold">Stable</span>
             </div>
-            <div class="w-full bg-slate-800 h-1.5 rounded-full mt-1.5 overflow-hidden">
+            <div class="w-full bg-slate-800 h-1 rounded-full mt-0.5 overflow-hidden">
                 <div class="bg-neonGreen h-full" style="width: 15%;"></div>
             </div>
         </div>
 
-        <div class="bg-tvCard border border-tvBorder p-2.5 rounded-xl flex flex-col justify-between">
-            <span class="text-[11px] font-bold text-slate-400 font-orbitron">SOLAR WIND</span>
-            <div class="flex items-baseline justify-between mt-1">
-                <span id="val-solarwind" class="text-2xl font-black text-white font-mono">395</span>
-                <span class="text-xs text-slate-400 font-mono">km/s</span>
+        <div class="bg-tvCard border border-tvBorder px-2 py-1.5 rounded-lg flex flex-col justify-between">
+            <span class="text-[9px] font-bold text-slate-400 font-orbitron">SOLAR WIND</span>
+            <div class="flex items-baseline justify-between">
+                <span id="val-solarwind" class="text-lg font-black text-white font-mono">395</span>
+                <span class="text-[9px] text-slate-400 font-mono">km/s</span>
             </div>
-            <div class="w-full bg-slate-800 h-1.5 rounded-full mt-1.5 overflow-hidden">
+            <div class="w-full bg-slate-800 h-1 rounded-full mt-0.5 overflow-hidden">
                 <div class="bg-slate-300 h-full" style="width: 40%;"></div>
             </div>
         </div>
 
-        <div class="bg-tvCard border border-tvBorder p-2.5 rounded-xl flex flex-col justify-between">
-            <span class="text-[11px] font-bold text-slate-400 font-orbitron">GEOMAG FIELD</span>
-            <div class="flex items-center justify-between mt-1">
-                <span id="val-geomag" class="text-lg font-extrabold text-neonGreen font-mono uppercase">QUIET</span>
-                <i class="fa-solid fa-shield-halved text-neonGreen text-lg"></i>
+        <div class="bg-tvCard border border-tvBorder px-2 py-1.5 rounded-lg flex flex-col justify-between">
+            <span class="text-[9px] font-bold text-slate-400 font-orbitron">GEOMAG FIELD</span>
+            <div class="flex items-center justify-between">
+                <span id="val-geomag" class="text-base font-extrabold text-neonGreen font-mono uppercase">QUIET</span>
+                <i class="fa-solid fa-shield-halved text-neonGreen text-sm"></i>
             </div>
-            <div class="text-[10px] text-slate-400 truncate">No Storm Warning</div>
+            <div class="text-[8px] text-slate-400 truncate">No Storm Warning</div>
         </div>
     </section>
 
-    <!-- MAIN TV CONTENT GRID -->
-    <main class="grid grid-cols-12 gap-4 flex-1">
+    <!-- MAIN TV CONTENT GRID (Flexible filling container without overflow) -->
+    <main class="grid grid-cols-12 gap-2 flex-1 min-h-0 my-1">
 
         <!-- LEFT: 3D GLOBE DISPLAY WITH PROPAGATION ARCS -->
-        <section class="col-span-7 bg-tvCard border border-tvBorder rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden">
-            <div class="flex items-center justify-between z-10 mb-2">
-                <div class="flex items-center space-x-3">
-                    <i class="fa-solid fa-earth-americas text-neonCyan text-xl"></i>
+        <section class="col-span-7 bg-tvCard border border-tvBorder rounded-xl p-2.5 flex flex-col justify-between relative overflow-hidden min-h-0">
+            <div class="flex items-center justify-between shrink-0 mb-1">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-earth-americas text-neonCyan text-base"></i>
                     <div>
-                        <h2 class="font-orbitron font-bold text-base text-white tracking-wide">3D HF PROPAGATION GLOBE</h2>
-                        <p class="text-xs text-slate-400">Great-Circle Beams from Falklands (51.7°S) • Live Day/Night Terminator</p>
+                        <h2 class="font-orbitron font-bold text-xs text-white tracking-wide">3D HF PROPAGATION GLOBE</h2>
+                        <p class="text-[9px] text-slate-400">Great-Circle Beams from Falklands (51.7°S)</p>
                     </div>
                 </div>
-                <div class="flex items-center space-x-2">
-                    <button id="btn-spin-toggle" tabindex="0" class="tv-focusable bg-tvDark hover:bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-mono text-neonCyan transition">
+                <div class="flex items-center space-x-1.5">
+                    <button id="btn-spin-toggle" tabindex="0" class="tv-focusable bg-tvDark hover:bg-slate-800 border border-slate-700 px-2 py-0.5 rounded text-[10px] font-mono text-neonCyan transition">
                         <i class="fa-solid fa-rotate mr-1"></i> Spin: ON
                     </button>
-                    <button id="btn-reset-cam" tabindex="0" class="tv-focusable bg-tvDark hover:bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-mono text-slate-300 transition">
-                        Reset Cam
+                    <button id="btn-reset-cam" tabindex="0" class="tv-focusable bg-tvDark hover:bg-slate-800 border border-slate-700 px-2 py-0.5 rounded text-[10px] font-mono text-slate-300 transition">
+                        Reset
                     </button>
                 </div>
             </div>
 
-            <!-- Globe Canvas -->
-            <div id="globe-container" class="w-full flex-1 relative rounded-xl overflow-hidden min-h-[300px]">
-                <div class="absolute bottom-3 left-3 z-10 bg-tvDark/90 border border-tvBorder p-3 rounded-xl text-xs space-y-1.5 pointer-events-none">
-                    <div class="flex items-center space-x-2">
-                        <span class="w-3 h-3 rounded-full bg-neonCyan"></span>
-                        <span class="text-slate-300 font-mono">QTH: VP8 Falklands</span>
+            <!-- Globe Canvas Container -->
+            <div id="globe-container" class="w-full flex-1 relative rounded-lg overflow-hidden min-h-0 bg-slate-950/40 border border-slate-900 flex items-center justify-center">
+                <div class="absolute bottom-2 left-2 z-10 bg-tvDark/90 border border-tvBorder p-1.5 rounded-lg text-[9px] space-y-1 pointer-events-none">
+                    <div class="flex items-center space-x-1.5">
+                        <span class="w-2 h-2 rounded-full bg-neonCyan"></span>
+                        <span class="text-slate-300 font-mono">VP8 Falklands</span>
                     </div>
-                    <div class="flex items-center space-x-2">
-                        <span class="w-3 h-0.5 bg-neonGreen"></span>
-                        <span class="text-slate-300 font-mono">Active DX Path</span>
+                    <div class="flex items-center space-x-1.5">
+                        <span class="w-2 h-0.5 bg-neonGreen"></span>
+                        <span class="text-slate-300 font-mono">DX Path</span>
                     </div>
                 </div>
             </div>
 
-            <div class="z-10 mt-2 bg-tvDark border border-slate-800 p-2.5 rounded-xl flex items-center justify-between text-xs font-mono">
-                <span class="text-slate-400"><i class="fa-solid fa-satellite-dish text-neonCyan mr-1"></i> Active DX Beams:</span>
-                <span class="text-neonCyan font-bold">VP8 ➔ EU / NA / JA / VK / ZS</span>
-                <span class="text-slate-400">LUF: <span class="text-white font-bold">7.1 MHz</span> | MUF: <span class="text-neonGreen font-bold">28.5 MHz</span></span>
+            <div class="shrink-0 mt-1.5 bg-tvDark border border-slate-800 px-2 py-1 rounded-lg flex items-center justify-between text-[10px] font-mono">
+                <span class="text-slate-400"><i class="fa-solid fa-satellite-dish text-neonCyan mr-1"></i> Beams: <b class="text-neonCyan">VP8 ➔ EU / NA / JA</b></span>
+                <span class="text-slate-400">LUF: <b class="text-white">7.1 MHz</b> | MUF: <b class="text-neonGreen">28.5 MHz</b></span>
             </div>
         </section>
 
         <!-- RIGHT: HF BAND ADVISOR + LIVE SDR MONITOR -->
-        <section class="col-span-5 flex flex-col space-y-4">
+        <section class="col-span-5 flex flex-col space-y-2 min-h-0">
             
             <!-- Band Recommendations Grid -->
-            <div class="bg-tvCard border border-tvBorder rounded-2xl p-4 flex-1 flex flex-col justify-between">
-                <div class="flex items-center justify-between mb-2">
-                    <div class="flex items-center space-x-2">
-                        <i class="fa-solid fa-chart-line text-neonAmber text-xl"></i>
-                        <h2 class="font-orbitron font-bold text-base text-white tracking-wide">DYNAMIC HF BAND ADVISOR</h2>
+            <div class="bg-tvCard border border-tvBorder rounded-xl p-2.5 flex-1 flex flex-col justify-between min-h-0">
+                <div class="flex items-center justify-between mb-1 shrink-0">
+                    <div class="flex items-center space-x-1.5">
+                        <i class="fa-solid fa-chart-line text-neonAmber text-sm"></i>
+                        <h2 class="font-orbitron font-bold text-xs text-white tracking-wide">DYNAMIC BAND ADVISOR</h2>
                     </div>
-                    <span class="text-[11px] font-mono bg-neonAmber/10 text-neonAmber border border-neonAmber/30 px-2 py-0.5 rounded-full">
-                        High-Lat So. Hemisphere
+                    <span class="text-[9px] font-mono bg-neonAmber/10 text-neonAmber border border-neonAmber/30 px-1.5 py-0.2 rounded">
+                        VP8 51.7° S
                     </span>
                 </div>
 
-                <div id="bands-grid" class="grid grid-cols-2 gap-2 max-h-[320px] overflow-y-auto">
+                <div id="bands-grid" class="grid grid-cols-2 gap-1.5 flex-1 overflow-hidden min-h-0">
                     <!-- Dynamic Band cards injected here -->
                 </div>
 
-                <div class="mt-2 p-2.5 bg-tvDark border border-slate-800 rounded-xl">
-                    <div class="text-xs font-bold text-slate-300 font-orbitron mb-1 flex items-center">
-                        <i class="fa-solid fa-circle-info text-neonCyan mr-1.5"></i> PROP ANALYSIS (VP8):
+                <div class="mt-1.5 p-1.5 bg-tvDark border border-slate-800 rounded-lg shrink-0">
+                    <div class="text-[9px] font-bold text-slate-300 font-orbitron mb-0.5 flex items-center">
+                        <i class="fa-solid fa-circle-info text-neonCyan mr-1"></i> VP8 PROP ANALYSIS:
                     </div>
-                    <p id="prop-analysis-text" class="text-xs text-slate-400 font-mono leading-relaxed truncate">
-                        High-latitude Southern Summer provides prolonged daylight hours...
+                    <p id="prop-analysis-text" class="text-[9px] text-slate-400 font-mono leading-tight truncate">
+                        High-latitude Southern Summer provides extended 20m/15m/10m DX openings.
                     </p>
                 </div>
             </div>
 
             <!-- LIVE STATION / WEBSDR AUDIO STREAM RECEIVER -->
-            <div class="bg-tvCard border border-tvBorder rounded-2xl p-4">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center space-x-2">
-                        <i class="fa-solid fa-radio text-neonGreen text-xl"></i>
-                        <h2 class="font-orbitron font-bold text-base text-white tracking-wide">SHORTWAVE / SDR MONITOR</h2>
+            <div class="bg-tvCard border border-tvBorder rounded-xl p-2.5 shrink-0">
+                <div class="flex items-center justify-between mb-1.5">
+                    <div class="flex items-center space-x-1.5">
+                        <i class="fa-solid fa-radio text-neonGreen text-sm"></i>
+                        <h2 class="font-orbitron font-bold text-xs text-white tracking-wide">SDR / BROADCAST MONITOR</h2>
                     </div>
-                    <span id="audio-status-badge" class="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">
+                    <span id="audio-status-badge" class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 border border-slate-700">
                         STANDBY
                     </span>
                 </div>
 
-                <div class="bg-tvDark border border-slate-800 rounded-xl p-3">
-                    <div class="flex items-center justify-between gap-3 mb-3">
-                        <div class="flex-1">
-                            <label class="block text-[10px] text-slate-400 font-mono mb-1">SELECT MONITOR CHANNEL</label>
-                            <select id="station-select" tabindex="0" class="tv-focusable w-full bg-slate-900 border border-slate-700 text-white font-mono text-xs rounded-lg p-2 focus:border-neonCyan focus:outline-none">
-                                <option value="14200000">VP8/Falklands SDR Monitor (14.200 MHz USB - 20m)</option>
-                                <option value="7074000">FT8 Global Activity Hub (7.074 MHz LSB - 40m)</option>
+                <div class="bg-tvDark border border-slate-800 rounded-lg p-2">
+                    <div class="flex items-center justify-between gap-2 mb-2">
+                        <div class="flex-1 min-w-0">
+                            <label class="block text-[8px] text-slate-400 font-mono mb-0.5">SELECT MONITOR CHANNEL</label>
+                            <select id="station-select" tabindex="0" class="tv-focusable w-full bg-slate-900 border border-slate-700 text-white font-mono text-[10px] rounded p-1 focus:border-neonCyan focus:outline-none truncate">
+                                <option value="14200000">VP8 Falklands SDR Monitor (14.200 MHz USB)</option>
+                                <option value="7074000">FT8 Global Activity Hub (7.074 MHz LSB)</option>
                                 <option value="28074000">10m Beacon & DX Spotter (28.074 MHz USB)</option>
                                 <option value="12095000">BBC World Service Shortwave (12.095 MHz AM)</option>
                                 <option value="10000000">WWV Time & Frequency Beacon (10.000 MHz AM)</option>
                             </select>
                         </div>
 
-                        <div class="text-right bg-slate-950 p-2 rounded-lg border border-slate-800 w-36">
-                            <div class="text-[10px] text-slate-500 font-mono">FREQUENCY</div>
-                            <div id="freq-display" class="text-lg font-black font-mono text-neonCyan glow-cyan">
-                                14.200 <span class="text-xs text-slate-400">MHz</span>
+                        <div class="text-right bg-slate-950 p-1 rounded border border-slate-800 shrink-0">
+                            <div class="text-[8px] text-slate-500 font-mono">FREQUENCY</div>
+                            <div id="freq-display" class="text-sm font-black font-mono text-neonCyan glow-cyan">
+                                14.200 <span class="text-[9px] text-slate-400">MHz</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-12 gap-3 items-center">
-                        <button id="btn-audio-play" tabindex="0" class="tv-focusable col-span-4 bg-neonGreen hover:bg-emerald-400 text-black font-bold font-orbitron py-2 px-3 rounded-lg flex items-center justify-center space-x-2 transition">
+                    <div class="grid grid-cols-12 gap-2 items-center">
+                        <button id="btn-audio-play" tabindex="0" class="tv-focusable col-span-5 bg-neonGreen hover:bg-emerald-400 text-black font-bold font-orbitron py-1 px-2 rounded flex items-center justify-center space-x-1 transition text-[10px]">
                             <i class="fa-solid fa-play"></i>
                             <span>TUNE IN</span>
                         </button>
 
-                        <div class="col-span-8 flex items-center space-x-3 bg-slate-900/60 p-2 rounded-lg border border-slate-800">
-                            <i class="fa-solid fa-volume-high text-slate-400 text-xs"></i>
-                            <input id="volume-slider" tabindex="0" type="range" min="0" max="1" step="0.05" value="0.5" class="tv-focusable w-full accent-neonCyan h-2 bg-slate-700 rounded-lg cursor-pointer">
-                            <canvas id="visualizer-canvas" class="w-24 h-7 bg-slate-950 rounded border border-slate-800"></canvas>
+                        <div class="col-span-7 flex items-center space-x-2 bg-slate-900/60 p-1 rounded border border-slate-800">
+                            <i class="fa-solid fa-volume-high text-slate-400 text-[10px]"></i>
+                            <input id="volume-slider" tabindex="0" type="range" min="0" max="1" step="0.05" value="0.5" class="tv-focusable w-full accent-neonCyan h-1.5 bg-slate-700 rounded cursor-pointer">
+                            <canvas id="visualizer-canvas" class="w-16 h-5 bg-slate-950 rounded border border-slate-800 shrink-0"></canvas>
                         </div>
                     </div>
                 </div>
@@ -343,16 +349,16 @@
     </main>
 
     <!-- FOOTER -->
-    <footer class="bg-tvCard border border-tvBorder rounded-xl p-2.5 flex items-center justify-between text-xs font-mono text-slate-400">
-        <div class="flex items-center space-x-4">
+    <footer class="bg-tvCard border border-tvBorder rounded-lg px-2.5 py-1 flex items-center justify-between text-[10px] font-mono text-slate-400 shrink-0 mt-0.5">
+        <div class="flex items-center space-x-3">
             <span class="text-neonCyan"><i class="fa-solid fa-satellite mr-1"></i> IONOSPHERE ENGINE: ONLINE</span>
             <span>|</span>
-            <span>QTH: 51.7963° S, 59.5236° W</span>
+            <span>QTH: 51.79° S, 59.52° W</span>
             <span>|</span>
             <span>Grid: GD18e</span>
         </div>
-        <div class="flex items-center space-x-3">
-            <span class="bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700">Fire TV D-Pad Nav Active</span>
+        <div class="flex items-center space-x-2">
+            <span class="bg-slate-800 text-slate-300 px-1.5 py-0.2 rounded border border-slate-700">Fire TV D-Pad Active</span>
         </div>
     </footer>
 
@@ -427,27 +433,17 @@
                         <div class="flex items-center space-x-2">
                             <span class="font-black text-sm font-orbitron text-white">${b.name}</span>
                             <span class="text-[10px] text-slate-400 font-mono">${b.freq}</span>
-                        </div>
-                    </div>
-                    <span class="text-xs px-2 py-0.5 rounded font-bold font-mono text-neonGreen border border-neonGreen/40 bg-neonGreen/10">
-                        OPEN
-                    </span>
-                `;
-                container.appendChild(card);
-            });
-        }
-        renderBands();
-
-        // 3. THREE.JS GLOBE ENGINE
+        // 3. THREE.JS GLOBE ENGINE WITH AUTO-RESIZING
         let scene, camera, renderer, globeGroup, autoSpin = true;
         function initGlobe() {
             const container = document.getElementById('globe-container');
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-            camera.position.z = 230;
+            camera.position.z = 180;
 
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
             container.appendChild(renderer.domElement);
 
             globeGroup = new THREE.Group();
@@ -455,20 +451,30 @@
 
             // Sphere
             const sphere = new THREE.Mesh(
-                new THREE.SphereGeometry(60, 32, 32),
+                new THREE.SphereGeometry(50, 32, 32),
                 new THREE.MeshBasicMaterial({ color: 0x0a1526, wireframe: false })
             );
             globeGroup.add(sphere);
 
             const wire = new THREE.Mesh(
-                new THREE.SphereGeometry(60.2, 24, 20),
+                new THREE.SphereGeometry(50.2, 24, 20),
                 new THREE.MeshBasicMaterial({ color: 0x1e293b, wireframe: true, transparent: true, opacity: 0.4 })
             );
             globeGroup.add(wire);
 
+            function onResize() {
+                if (!container || !renderer || !camera) return;
+                const w = container.clientWidth;
+                const h = container.clientHeight;
+                camera.aspect = w / h;
+                camera.updateProjectionMatrix();
+                renderer.setSize(w, h);
+            }
+            window.addEventListener('resize', onResize);
+
             function animate() {
                 requestAnimationFrame(animate);
-                if (autoSpin) globeGroup.rotation.y += 0.002;
+                if (autoSpin) globeGroup.rotation.y += 0.0025;
                 renderer.render(scene, camera);
             }
             animate();
@@ -526,3 +532,4 @@
     </script>
 </body>
 </html>
+```
