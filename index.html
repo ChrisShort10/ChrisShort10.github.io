@@ -411,6 +411,9 @@
 
     <!-- SCRIPT ENGINE -->
     <script>
+        // Declare onGlobeResize once at top level scope
+        let onGlobeResize = function() {};
+
         // 1. OVERSCAN & UI DISPLAY SCALER
         const scaler = document.getElementById('app-scaler');
         const scaleSelect = document.getElementById('scale-select');
@@ -624,7 +627,7 @@
         renderBands();
 
         // 5. THREE.JS 3D GLOBE WITH CONTINENTAL OUTLINES
-        let scene, camera, renderer, globeGroup, autoSpin = true, onGlobeResize;
+        let scene, camera, renderer, globeGroup, autoSpin = true;
 
         // Procedural Continental Texture Generator
         function createLandmassTexture() {
