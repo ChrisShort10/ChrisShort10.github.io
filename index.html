@@ -1,10 +1,9 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VP8 Falklands - Fire TV Ham Radio Dashboard</title>
+    <title>VP8 Falklands - TV Ham Radio Dashboard</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Orbitron & JetBrains Mono -->
@@ -22,8 +21,8 @@
                 extend: {
                     colors: {
                         tvDark: '#080c14',
-                        tvCard: '#111827',
-                        tvBorder: '#1f293d',
+                        tvCard: '#0f172a',
+                        tvBorder: '#1e293b',
                         neonCyan: '#00f0ff',
                         neonGreen: '#00ff66',
                         neonAmber: '#ffb700',
@@ -44,11 +43,11 @@
             box-sizing: border-box;
         }
 
-        body {
+        html, body {
             background-color: #06090e;
             color: #e2e8f0;
             font-family: 'JetBrains Mono', monospace;
-            overflow: hidden; /* Prevent scrolling on TV screen */
+            overflow: hidden;
             user-select: none;
             width: 100vw;
             height: 100vh;
@@ -56,315 +55,377 @@
             padding: 0;
         }
 
-        /* 10-Foot UI TV Text Glows */
-        .glow-cyan { text-shadow: 0 0 12px rgba(0, 240, 255, 0.7); }
-        .glow-green { text-shadow: 0 0 12px rgba(0, 255, 102, 0.7); }
-        .glow-amber { text-shadow: 0 0 12px rgba(255, 183, 0, 0.7); }
+        /* 10-Foot UI Glows */
+        .glow-cyan { text-shadow: 0 0 10px rgba(0, 240, 255, 0.7); }
+        .glow-green { text-shadow: 0 0 10px rgba(0, 255, 102, 0.7); }
+        .glow-amber { text-shadow: 0 0 10px rgba(255, 183, 0, 0.7); }
 
-        /* FIRE TV REMOTE D-PAD FOCUS HIGHLIGHT STYLES */
+        /* D-PAD SPATIAL NAVIGATION FOCUS HIGHLIGHTS */
         .tv-focusable {
             outline: none;
             transition: all 0.15s ease-in-out;
         }
         .tv-focusable:focus, .tv-focusable.tv-focused {
-            transform: scale(1.02);
+            transform: scale(1.03);
             border-color: #00f0ff !important;
-            box-shadow: 0 0 18px rgba(0, 240, 255, 0.7), inset 0 0 8px rgba(0, 240, 255, 0.3);
+            box-shadow: 0 0 16px rgba(0, 240, 255, 0.8), inset 0 0 6px rgba(0, 240, 255, 0.4);
             z-index: 50;
+        }
+
+        /* Active Toggle state */
+        .btn-toggle-active {
+            background-color: rgba(0, 240, 255, 0.15) !important;
+            border-color: #00f0ff !important;
+            color: #00f0ff !important;
         }
 
         /* Grid Background Pattern */
         .bg-grid-pattern {
-            background-size: 36px 36px;
+            background-size: 32px 32px;
             background-image: 
                 linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
                 linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
         }
 
-        /* Hide scrollbars for slick TV layout */
-        ::-webkit-scrollbar { display: none; }
+        /* Custom Scrollbar for inner TV cards */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: #080c14; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00f0ff; }
     </style>
 </head>
-<body class="bg-grid-pattern p-2.5 flex flex-col justify-between h-screen w-screen overflow-hidden select-none">
+<body class="bg-grid-pattern p-2 flex flex-col justify-between h-screen w-screen overflow-hidden select-none">
 
-    <!-- FIRE TV INSTRUCTION OVERLAY BANNER -->
-    <div id="tv-guide-bar" class="bg-neonCyan/10 border border-neonCyan/40 text-neonCyan px-3 py-1 rounded-lg flex items-center justify-between text-[11px] font-mono shrink-0">
-        <div class="flex items-center space-x-2">
-            <i class="fa-solid fa-tv text-sm"></i>
-            <span class="font-bold">FIRE TV / SILK BROWSER OPTIMIZED:</span>
-            <span class="text-slate-300">Use Remote D-Pad (<b>▲ ▼ ◄ ►</b>) & Select button to navigate.</span>
-        </div>
-        <button id="btn-fullscreen" class="tv-focusable bg-neonCyan text-black font-bold font-orbitron px-2.5 py-0.5 rounded text-[10px] hover:bg-cyan-300">
-            <i class="fa-solid fa-expand mr-1"></i> Fullscreen
-        </button>
-    </div>
+    <!-- MASTER SCALING WRAPPER FOR OVERSCAN COMPENSATIONS -->
+    <div id="app-scaler" class="w-full h-full flex flex-col justify-between transition-all duration-200" style="transform-origin: top center;">
 
-    <!-- TOP HEADER BAR: CLOCKS & QTH -->
-    <header class="grid grid-cols-12 gap-2 my-1 shrink-0">
-        <!-- QTH Callsign Badge (Fixed overlap issue) -->
-        <div class="col-span-3 bg-tvCard/90 border border-tvBorder rounded-xl p-2 flex items-center justify-between shadow-xl min-w-0">
-            <div class="flex items-center space-x-2 min-w-0">
-                <div class="w-10 h-10 rounded-lg bg-neonCyan/10 border border-neonCyan/50 flex items-center justify-center text-neonCyan text-lg font-black font-orbitron shrink-0">
-                    VP8
-                </div>
-                <div class="min-w-0 leading-tight">
-                    <h1 class="text-sm font-black font-orbitron text-white truncate">STANLEY QTH</h1>
-                    <p class="text-[10px] text-slate-400 font-mono truncate">Falklands • 51.7° S</p>
-                </div>
-            </div>
-            <span id="season-badge" class="px-2 py-0.5 rounded text-[9px] font-bold font-orbitron uppercase bg-neonAmber/20 text-neonAmber border border-neonAmber/40 shrink-0">
-                SUMMER
-            </span>
-        </div>
-
-        <!-- HIGH-PRECISION DUAL CLOCK ENGINE -->
-        <div class="col-span-9 bg-tvCard/90 border border-tvBorder rounded-xl p-1.5 shadow-xl flex items-center justify-between">
+        <!-- TOP MODULAR CONTROL TOOLBAR -->
+        <header id="top-bar" class="bg-tvCard/90 border border-tvBorder rounded-xl p-2 mb-1 flex flex-wrap items-center justify-between shrink-0 shadow-2xl gap-2">
             
-            <!-- FKST LOCAL TIME -->
-            <div class="flex-1 bg-tvDark border border-slate-800 px-3 py-1 rounded-lg mr-2 flex items-center justify-between">
-                <div>
-                    <div class="flex items-center space-x-1.5">
-                        <span class="w-2 h-2 rounded-full bg-neonCyan animate-ping"></span>
-                        <span class="text-[10px] font-bold font-orbitron text-neonCyan uppercase">FKST Local (UTC-3)</span>
-                    </div>
-                    <div class="text-xl font-black font-mono text-white glow-cyan" id="clock-fkst">
-                        00:00:00.<span class="text-sm text-neonCyan/70">000</span>
-                    </div>
+            <!-- Left: Presets & Scaler -->
+            <div class="flex items-center space-x-2">
+                <div class="flex items-center space-x-1 bg-tvDark border border-slate-800 p-1 rounded-lg">
+                    <span class="text-[10px] font-orbitron text-slate-400 px-1 font-bold"><i class="fa-solid fa-sliders text-neonCyan mr-1"></i>PRESET:</span>
+                    <button id="preset-full" tabindex="0" class="tv-focusable px-2 py-0.5 rounded text-[10px] font-mono btn-toggle-active transition">Full</button>
+                    <button id="preset-globe" tabindex="0" class="tv-focusable px-2 py-0.5 rounded text-[10px] font-mono text-slate-300 hover:text-white transition">Globe Focus</button>
+                    <button id="preset-monitors" tabindex="0" class="tv-focusable px-2 py-0.5 rounded text-[10px] font-mono text-slate-300 hover:text-white transition">Monitors</button>
                 </div>
-                <div class="text-right text-[10px] font-mono">
-                    <div id="date-fkst" class="font-bold text-slate-200">2026-10-30</div>
-                    <div id="solar-phase" class="text-neonAmber font-bold">Daylight Phase</div>
-                </div>
-            </div>
 
-            <!-- UTC TIME -->
-            <div class="flex-1 bg-tvDark border border-slate-800 px-3 py-1 rounded-lg flex items-center justify-between">
-                <div>
-                    <div class="flex items-center space-x-1.5">
-                        <span class="w-2 h-2 rounded-full bg-neonGreen"></span>
-                        <span class="text-[10px] font-bold font-orbitron text-neonGreen uppercase">UTC Time</span>
-                    </div>
-                    <div class="text-xl font-black font-mono text-white glow-green" id="clock-utc">
-                        00:00:00.<span class="text-sm text-neonGreen/70">000</span>
-                    </div>
-                </div>
-                <div class="text-right text-[10px] font-mono">
-                    <div id="date-utc" class="font-bold text-slate-200">2026-10-30</div>
-                    <div class="text-slate-400">ZULU TIME</div>
+                <!-- Display Zoom Scaler -->
+                <div class="flex items-center space-x-1 bg-tvDark border border-slate-800 p-1 rounded-lg">
+                    <span class="text-[10px] font-orbitron text-slate-400 px-1 font-bold"><i class="fa-solid fa-expand text-neonAmber mr-1"></i>SCALE:</span>
+                    <select id="scale-select" tabindex="0" class="tv-focusable bg-slate-900 border border-slate-700 text-neonCyan font-mono text-[10px] rounded px-1 py-0.5 focus:outline-none">
+                        <option value="1">100%</option>
+                        <option value="0.95">95%</option>
+                        <option value="0.9" selected>90% (TV Safe)</option>
+                        <option value="0.85">85%</option>
+                        <option value="0.75">75%</option>
+                        <option value="0.65">65%</option>
+                    </select>
                 </div>
             </div>
 
-        </div>
-    </header>
+            <!-- Center: Modular Panel Toggles -->
+            <div class="flex items-center space-x-1 bg-tvDark border border-slate-800 p-1 rounded-lg overflow-x-auto">
+                <span class="text-[10px] font-orbitron text-slate-400 px-1 font-bold">TOGGLE:</span>
+                <button id="toggle-qth" tabindex="0" class="tv-focusable px-1.5 py-0.5 rounded text-[10px] font-mono btn-toggle-active transition">QTH</button>
+                <button id="toggle-clock" tabindex="0" class="tv-focusable px-1.5 py-0.5 rounded text-[10px] font-mono btn-toggle-active transition">Clock</button>
+                <button id="toggle-solar" tabindex="0" class="tv-focusable px-1.5 py-0.5 rounded text-[10px] font-mono btn-toggle-active transition">Solar</button>
+                <button id="toggle-globe" tabindex="0" class="tv-focusable px-1.5 py-0.5 rounded text-[10px] font-mono btn-toggle-active transition">Globe</button>
+                <button id="toggle-bands" tabindex="0" class="tv-focusable px-1.5 py-0.5 rounded text-[10px] font-mono btn-toggle-active transition">Bands</button>
+                <button id="toggle-sdr" tabindex="0" class="tv-focusable px-1.5 py-0.5 rounded text-[10px] font-mono btn-toggle-active transition">WebSDR</button>
+            </div>
 
-    <!-- SOLAR INDICES BANNER -->
-    <section class="grid grid-cols-6 gap-2 my-1 shrink-0">
-        <div class="bg-tvCard border border-tvBorder px-2 py-1.5 rounded-lg flex flex-col justify-between">
-            <span class="text-[9px] font-bold text-slate-400 font-orbitron">SFI (SOLAR FLUX)</span>
-            <div class="flex items-baseline justify-between">
-                <span id="val-sfi" class="text-lg font-black text-neonCyan font-mono">168</span>
-                <span class="text-[9px] text-neonGreen font-semibold"><i class="fa-solid fa-arrow-up"></i> High</span>
+            <!-- Right: TV Remote Guide & Fullscreen -->
+            <div class="flex items-center space-x-2">
+                <span class="text-[10px] font-mono text-slate-400 hidden xl:inline"><i class="fa-solid fa-gamepad text-neonGreen mr-1"></i>D-Pad Ready</span>
+                <button id="btn-fullscreen" tabindex="0" class="tv-focusable bg-neonCyan/20 hover:bg-neonCyan/30 text-neonCyan border border-neonCyan/50 font-bold font-orbitron px-2 py-0.5 rounded text-[10px]">
+                    <i class="fa-solid fa-expand"></i>
+                </button>
             </div>
-            <div class="w-full bg-slate-800 h-1 rounded-full mt-0.5 overflow-hidden">
-                <div class="bg-neonCyan h-full" style="width: 78%;"></div>
-            </div>
-        </div>
+        </header>
 
-        <div class="bg-tvCard border border-tvBorder px-2 py-1.5 rounded-lg flex flex-col justify-between">
-            <span class="text-[9px] font-bold text-slate-400 font-orbitron">SUNSPOT (SSN)</span>
-            <div class="flex items-baseline justify-between">
-                <span id="val-ssn" class="text-lg font-black text-neonAmber font-mono">134</span>
-                <span class="text-[9px] text-neonAmber font-semibold">Active</span>
+        <!-- TOP TELEMETRY BAR: QTH & CLOCK MODULES -->
+        <div id="row-telemetry" class="grid grid-cols-12 gap-2 mb-1 shrink-0">
+            
+            <!-- MODULE 1: STANLEY QTH INFO -->
+            <div id="panel-qth" class="col-span-3 bg-tvCard border border-tvBorder rounded-xl p-2 flex items-center justify-between shadow-xl min-w-0">
+                <div class="flex items-center space-x-2.5 min-w-0">
+                    <div class="w-10 h-10 rounded-lg bg-neonCyan/10 border border-neonCyan/50 flex items-center justify-center text-neonCyan text-base font-black font-orbitron shrink-0">
+                        VP8
+                    </div>
+                    <div class="min-w-0 leading-tight">
+                        <h1 class="text-xs font-black font-orbitron text-white truncate">STANLEY QTH</h1>
+                        <p class="text-[10px] text-slate-400 font-mono truncate">Falklands • 51.7° S</p>
+                        <p class="text-[9px] text-neonCyan/80 font-mono truncate">Grid: GD18e</p>
+                    </div>
+                </div>
+                <span id="season-badge" class="px-2 py-1 rounded text-[9px] font-bold font-orbitron uppercase bg-neonAmber/20 text-neonAmber border border-neonAmber/40 shrink-0">
+                    SUMMER
+                </span>
             </div>
-            <div class="w-full bg-slate-800 h-1 rounded-full mt-0.5 overflow-hidden">
-                <div class="bg-neonAmber h-full" style="width: 68%;"></div>
-            </div>
-        </div>
 
-        <div class="bg-tvCard border border-tvBorder px-2 py-1.5 rounded-lg flex flex-col justify-between">
-            <span class="text-[9px] font-bold text-slate-400 font-orbitron">A-INDEX</span>
-            <div class="flex items-baseline justify-between">
-                <span id="val-aindex" class="text-lg font-black text-neonGreen font-mono">05</span>
-                <span class="text-[9px] text-neonGreen font-semibold">Quiet</span>
-            </div>
-            <div class="w-full bg-slate-800 h-1 rounded-full mt-0.5 overflow-hidden">
-                <div class="bg-neonGreen h-full" style="width: 18%;"></div>
-            </div>
-        </div>
-
-        <div class="bg-tvCard border border-tvBorder px-2 py-1.5 rounded-lg flex flex-col justify-between">
-            <span class="text-[9px] font-bold text-slate-400 font-orbitron">K-INDEX</span>
-            <div class="flex items-baseline justify-between">
-                <span id="val-kindex" class="text-lg font-black text-neonGreen font-mono">1</span>
-                <span class="text-[9px] text-neonGreen font-semibold">Stable</span>
-            </div>
-            <div class="w-full bg-slate-800 h-1 rounded-full mt-0.5 overflow-hidden">
-                <div class="bg-neonGreen h-full" style="width: 15%;"></div>
-            </div>
-        </div>
-
-        <div class="bg-tvCard border border-tvBorder px-2 py-1.5 rounded-lg flex flex-col justify-between">
-            <span class="text-[9px] font-bold text-slate-400 font-orbitron">SOLAR WIND</span>
-            <div class="flex items-baseline justify-between">
-                <span id="val-solarwind" class="text-lg font-black text-white font-mono">395</span>
-                <span class="text-[9px] text-slate-400 font-mono">km/s</span>
-            </div>
-            <div class="w-full bg-slate-800 h-1 rounded-full mt-0.5 overflow-hidden">
-                <div class="bg-slate-300 h-full" style="width: 40%;"></div>
-            </div>
-        </div>
-
-        <div class="bg-tvCard border border-tvBorder px-2 py-1.5 rounded-lg flex flex-col justify-between">
-            <span class="text-[9px] font-bold text-slate-400 font-orbitron">GEOMAG FIELD</span>
-            <div class="flex items-center justify-between">
-                <span id="val-geomag" class="text-base font-extrabold text-neonGreen font-mono uppercase">QUIET</span>
-                <i class="fa-solid fa-shield-halved text-neonGreen text-sm"></i>
-            </div>
-            <div class="text-[8px] text-slate-400 truncate">No Storm Warning</div>
-        </div>
-    </section>
-
-    <!-- MAIN TV CONTENT GRID (Flexible filling container without overflow) -->
-    <main class="grid grid-cols-12 gap-2 flex-1 min-h-0 my-1">
-
-        <!-- LEFT: 3D GLOBE DISPLAY WITH PROPAGATION ARCS -->
-        <section class="col-span-7 bg-tvCard border border-tvBorder rounded-xl p-2.5 flex flex-col justify-between relative overflow-hidden min-h-0">
-            <div class="flex items-center justify-between shrink-0 mb-1">
-                <div class="flex items-center space-x-2">
-                    <i class="fa-solid fa-earth-americas text-neonCyan text-base"></i>
+            <!-- MODULE 2: DUAL FKST / UTC CLOCK -->
+            <div id="panel-clock" class="col-span-9 bg-tvCard border border-tvBorder rounded-xl p-1.5 shadow-xl flex items-center justify-between gap-2">
+                <!-- FKST LOCAL (UTC-3) -->
+                <div class="flex-1 bg-tvDark border border-slate-800 px-3 py-1 rounded-lg flex items-center justify-between">
                     <div>
-                        <h2 class="font-orbitron font-bold text-xs text-white tracking-wide">3D HF PROPAGATION GLOBE</h2>
-                        <p class="text-[9px] text-slate-400">Great-Circle Beams from Falklands (51.7°S)</p>
+                        <div class="flex items-center space-x-1.5">
+                            <span class="w-2 h-2 rounded-full bg-neonCyan animate-ping"></span>
+                            <span class="text-[10px] font-bold font-orbitron text-neonCyan uppercase">FKST Local (UTC-3)</span>
+                        </div>
+                        <div class="text-lg font-black font-mono text-white glow-cyan" id="clock-fkst">
+                            00:00:00.<span class="text-sm text-neonCyan/70">000</span>
+                        </div>
+                    </div>
+                    <div class="text-right text-[10px] font-mono">
+                        <div id="date-fkst" class="font-bold text-slate-200">2026-10-30</div>
+                        <div id="solar-phase" class="text-neonAmber font-bold">Daylight Phase</div>
                     </div>
                 </div>
-                <div class="flex items-center space-x-1.5">
-                    <button id="btn-spin-toggle" tabindex="0" class="tv-focusable bg-tvDark hover:bg-slate-800 border border-slate-700 px-2 py-0.5 rounded text-[10px] font-mono text-neonCyan transition">
-                        <i class="fa-solid fa-rotate mr-1"></i> Spin: ON
-                    </button>
-                    <button id="btn-reset-cam" tabindex="0" class="tv-focusable bg-tvDark hover:bg-slate-800 border border-slate-700 px-2 py-0.5 rounded text-[10px] font-mono text-slate-300 transition">
-                        Reset
-                    </button>
+
+                <!-- UTC ZULU -->
+                <div class="flex-1 bg-tvDark border border-slate-800 px-3 py-1 rounded-lg flex items-center justify-between">
+                    <div>
+                        <div class="flex items-center space-x-1.5">
+                            <span class="w-2 h-2 rounded-full bg-neonGreen"></span>
+                            <span class="text-[10px] font-bold font-orbitron text-neonGreen uppercase">UTC Time</span>
+                        </div>
+                        <div class="text-lg font-black font-mono text-white glow-green" id="clock-utc">
+                            00:00:00.<span class="text-sm text-neonGreen/70">000</span>
+                        </div>
+                    </div>
+                    <div class="text-right text-[10px] font-mono">
+                        <div id="date-utc" class="font-bold text-slate-200">2026-10-30</div>
+                        <div class="text-slate-400">ZULU TIME</div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Globe Canvas Container -->
-            <div id="globe-container" class="w-full flex-1 relative rounded-lg overflow-hidden min-h-0 bg-slate-950/40 border border-slate-900 flex items-center justify-center">
-                <div class="absolute bottom-2 left-2 z-10 bg-tvDark/90 border border-tvBorder p-1.5 rounded-lg text-[9px] space-y-1 pointer-events-none">
-                    <div class="flex items-center space-x-1.5">
-                        <span class="w-2 h-2 rounded-full bg-neonCyan"></span>
-                        <span class="text-slate-300 font-mono">VP8 Falklands</span>
-                    </div>
-                    <div class="flex items-center space-x-1.5">
-                        <span class="w-2 h-0.5 bg-neonGreen"></span>
-                        <span class="text-slate-300 font-mono">DX Path</span>
-                    </div>
+        </div>
+
+        <!-- MODULE 3: SOLAR INDICES GRID -->
+        <section id="panel-solar" class="grid grid-cols-6 gap-2 mb-1 shrink-0">
+            <div class="bg-tvCard border border-tvBorder px-2.5 py-1.5 rounded-xl flex flex-col justify-between">
+                <span class="text-[9px] font-bold text-slate-400 font-orbitron">SFI (SOLAR FLUX)</span>
+                <div class="flex items-baseline justify-between">
+                    <span id="val-sfi" class="text-base font-black text-neonCyan font-mono">168</span>
+                    <span class="text-[9px] text-neonGreen font-semibold"><i class="fa-solid fa-arrow-up"></i> High</span>
+                </div>
+                <div class="w-full bg-slate-800 h-1 rounded-full overflow-hidden mt-0.5">
+                    <div class="bg-neonCyan h-full" style="width: 78%;"></div>
                 </div>
             </div>
 
-            <div class="shrink-0 mt-1.5 bg-tvDark border border-slate-800 px-2 py-1 rounded-lg flex items-center justify-between text-[10px] font-mono">
-                <span class="text-slate-400"><i class="fa-solid fa-satellite-dish text-neonCyan mr-1"></i> Beams: <b class="text-neonCyan">VP8 ➔ EU / NA / JA</b></span>
-                <span class="text-slate-400">LUF: <b class="text-white">7.1 MHz</b> | MUF: <b class="text-neonGreen">28.5 MHz</b></span>
+            <div class="bg-tvCard border border-tvBorder px-2.5 py-1.5 rounded-xl flex flex-col justify-between">
+                <span class="text-[9px] font-bold text-slate-400 font-orbitron">SUNSPOT (SSN)</span>
+                <div class="flex items-baseline justify-between">
+                    <span id="val-ssn" class="text-base font-black text-neonAmber font-mono">134</span>
+                    <span class="text-[9px] text-neonAmber font-semibold">Active</span>
+                </div>
+                <div class="w-full bg-slate-800 h-1 rounded-full overflow-hidden mt-0.5">
+                    <div class="bg-neonAmber h-full" style="width: 68%;"></div>
+                </div>
+            </div>
+
+            <div class="bg-tvCard border border-tvBorder px-2.5 py-1.5 rounded-xl flex flex-col justify-between">
+                <span class="text-[9px] font-bold text-slate-400 font-orbitron">A-INDEX</span>
+                <div class="flex items-baseline justify-between">
+                    <span id="val-aindex" class="text-base font-black text-neonGreen font-mono">05</span>
+                    <span class="text-[9px] text-neonGreen font-semibold">Quiet</span>
+                </div>
+                <div class="w-full bg-slate-800 h-1 rounded-full overflow-hidden mt-0.5">
+                    <div class="bg-neonGreen h-full" style="width: 18%;"></div>
+                </div>
+            </div>
+
+            <div class="bg-tvCard border border-tvBorder px-2.5 py-1.5 rounded-xl flex flex-col justify-between">
+                <span class="text-[9px] font-bold text-slate-400 font-orbitron">K-INDEX</span>
+                <div class="flex items-baseline justify-between">
+                    <span id="val-kindex" class="text-base font-black text-neonGreen font-mono">1</span>
+                    <span class="text-[9px] text-neonGreen font-semibold">Stable</span>
+                </div>
+                <div class="w-full bg-slate-800 h-1 rounded-full overflow-hidden mt-0.5">
+                    <div class="bg-neonGreen h-full" style="width: 15%;"></div>
+                </div>
+            </div>
+
+            <div class="bg-tvCard border border-tvBorder px-2.5 py-1.5 rounded-xl flex flex-col justify-between">
+                <span class="text-[9px] font-bold text-slate-400 font-orbitron">SOLAR WIND</span>
+                <div class="flex items-baseline justify-between">
+                    <span id="val-solarwind" class="text-base font-black text-white font-mono">395</span>
+                    <span class="text-[9px] text-slate-400 font-mono">km/s</span>
+                </div>
+                <div class="w-full bg-slate-800 h-1 rounded-full overflow-hidden mt-0.5">
+                    <div class="bg-slate-300 h-full" style="width: 40%;"></div>
+                </div>
+            </div>
+
+            <div class="bg-tvCard border border-tvBorder px-2.5 py-1.5 rounded-xl flex flex-col justify-between">
+                <span class="text-[9px] font-bold text-slate-400 font-orbitron">GEOMAG FIELD</span>
+                <div class="flex items-center justify-between">
+                    <span id="val-geomag" class="text-sm font-extrabold text-neonGreen font-mono uppercase">QUIET</span>
+                    <i class="fa-solid fa-shield-halved text-neonGreen text-xs"></i>
+                </div>
+                <div class="text-[8px] text-slate-400 truncate">No Storm Warning</div>
             </div>
         </section>
 
-        <!-- RIGHT: HF BAND ADVISOR + LIVE SDR MONITOR -->
-        <section class="col-span-5 flex flex-col space-y-2 min-h-0">
-            
-            <!-- Band Recommendations Grid -->
-            <div class="bg-tvCard border border-tvBorder rounded-xl p-2.5 flex-1 flex flex-col justify-between min-h-0">
-                <div class="flex items-center justify-between mb-1 shrink-0">
+        <!-- MAIN RESPONSIVE CONTENT AREA -->
+        <main id="main-content" class="grid grid-cols-12 gap-2 flex-1 min-h-0 my-1 overflow-hidden">
+
+            <!-- MODULE 4: 3D GLOBE WITH CONTINENT OUTLINES -->
+            <section id="panel-globe" class="col-span-7 bg-tvCard border border-tvBorder rounded-xl p-2 flex flex-col justify-between relative overflow-hidden min-h-0 shadow-2xl">
+                <div class="flex items-center justify-between shrink-0 mb-1">
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-solid fa-earth-americas text-neonCyan text-base"></i>
+                        <div>
+                            <h2 class="font-orbitron font-bold text-xs text-white tracking-wide">3D HF PROPAGATION GLOBE</h2>
+                            <p class="text-[9px] text-slate-400">Great-Circle Beams from Falklands (51.7°S)</p>
+                        </div>
+                    </div>
                     <div class="flex items-center space-x-1.5">
-                        <i class="fa-solid fa-chart-line text-neonAmber text-sm"></i>
-                        <h2 class="font-orbitron font-bold text-xs text-white tracking-wide">DYNAMIC BAND ADVISOR</h2>
+                        <button id="btn-spin-toggle" tabindex="0" class="tv-focusable bg-tvDark hover:bg-slate-800 border border-slate-700 px-2 py-0.5 rounded text-[10px] font-mono text-neonCyan transition">
+                            <i class="fa-solid fa-rotate mr-1"></i> Spin: ON
+                        </button>
+                        <button id="btn-reset-cam" tabindex="0" class="tv-focusable bg-tvDark hover:bg-slate-800 border border-slate-700 px-2 py-0.5 rounded text-[10px] font-mono text-slate-300 transition">
+                            Reset
+                        </button>
                     </div>
-                    <span class="text-[9px] font-mono bg-neonAmber/10 text-neonAmber border border-neonAmber/30 px-1.5 py-0.2 rounded">
-                        VP8 51.7° S
-                    </span>
                 </div>
 
-                <div id="bands-grid" class="grid grid-cols-2 gap-1.5 flex-1 overflow-hidden min-h-0">
-                    <!-- Dynamic Band cards injected here -->
-                </div>
-
-                <div class="mt-1.5 p-1.5 bg-tvDark border border-slate-800 rounded-lg shrink-0">
-                    <div class="text-[9px] font-bold text-slate-300 font-orbitron mb-0.5 flex items-center">
-                        <i class="fa-solid fa-circle-info text-neonCyan mr-1"></i> VP8 PROP ANALYSIS:
+                <!-- Resizable 3D Canvas Box -->
+                <div id="globe-container" class="w-full flex-1 relative rounded-lg overflow-hidden min-h-0 bg-slate-950/60 border border-slate-900 flex items-center justify-center">
+                    <div class="absolute bottom-2 left-2 z-10 bg-tvDark/90 border border-tvBorder p-1.5 rounded-lg text-[9px] space-y-1 pointer-events-none">
+                        <div class="flex items-center space-x-1.5">
+                            <span class="w-2 h-2 rounded-full bg-neonCyan"></span>
+                            <span class="text-slate-300 font-mono">VP8 Falklands (QTH)</span>
+                        </div>
+                        <div class="flex items-center space-x-1.5">
+                            <span class="w-2 h-0.5 bg-neonGreen"></span>
+                            <span class="text-slate-300 font-mono">DX Path Beams</span>
+                        </div>
                     </div>
-                    <p id="prop-analysis-text" class="text-[9px] text-slate-400 font-mono leading-tight truncate">
-                        High-latitude Southern Summer provides extended 20m/15m/10m DX openings.
-                    </p>
                 </div>
-            </div>
 
-            <!-- LIVE STATION / WEBSDR AUDIO STREAM RECEIVER -->
-            <div class="bg-tvCard border border-tvBorder rounded-xl p-2.5 shrink-0">
-                <div class="flex items-center justify-between mb-1.5">
-                    <div class="flex items-center space-x-1.5">
-                        <i class="fa-solid fa-radio text-neonGreen text-sm"></i>
-                        <h2 class="font-orbitron font-bold text-xs text-white tracking-wide">SDR / BROADCAST MONITOR</h2>
+                <div class="shrink-0 mt-1 bg-tvDark border border-slate-800 px-2 py-1 rounded-lg flex items-center justify-between text-[10px] font-mono">
+                    <span class="text-slate-400"><i class="fa-solid fa-satellite-dish text-neonCyan mr-1"></i> Beams: <b class="text-neonCyan">VP8 ➔ EU / NA / JA</b></span>
+                    <span class="text-slate-400">LUF: <b class="text-white">7.1 MHz</b> | MUF: <b class="text-neonGreen">28.5 MHz</b></span>
+                </div>
+            </section>
+
+            <!-- RIGHT COLUMN: BANDS ADVISOR + WEBSDR -->
+            <section id="panel-right-col" class="col-span-5 flex flex-col space-y-2 min-h-0">
+                
+                <!-- MODULE 5: DYNAMIC BAND ADVISOR -->
+                <div id="panel-bands" class="bg-tvCard border border-tvBorder rounded-xl p-2 flex-1 flex flex-col justify-between min-h-0 shadow-2xl">
+                    <div class="flex items-center justify-between mb-1 shrink-0">
+                        <div class="flex items-center space-x-1.5">
+                            <i class="fa-solid fa-chart-line text-neonAmber text-sm"></i>
+                            <h2 class="font-orbitron font-bold text-xs text-white tracking-wide">DYNAMIC BAND ADVISOR</h2>
+                        </div>
+                        <span class="text-[9px] font-mono bg-neonAmber/10 text-neonAmber border border-neonAmber/30 px-1.5 py-0.2 rounded">
+                            VP8 51.7° S
+                        </span>
                     </div>
-                    <span id="audio-status-badge" class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 border border-slate-700">
-                        STANDBY
-                    </span>
+
+                    <div id="bands-grid" class="grid grid-cols-2 gap-1.5 flex-1 overflow-y-auto pr-1 min-h-0">
+                        <!-- Bands injected dynamically -->
+                    </div>
+
+                    <div class="mt-1 p-1.5 bg-tvDark border border-slate-800 rounded-lg shrink-0">
+                        <div class="text-[9px] font-bold text-slate-300 font-orbitron mb-0.5 flex items-center">
+                            <i class="fa-solid fa-circle-info text-neonCyan mr-1"></i> VP8 PROP ANALYSIS:
+                        </div>
+                        <p id="prop-analysis-text" class="text-[9px] text-slate-400 font-mono leading-tight">
+                            High-latitude Southern Summer provides extended 20m/15m/10m DX openings.
+                        </p>
+                    </div>
                 </div>
 
-                <div class="bg-tvDark border border-slate-800 rounded-lg p-2">
-                    <div class="flex items-center justify-between gap-2 mb-2">
-                        <div class="flex-1 min-w-0">
-                            <label class="block text-[8px] text-slate-400 font-mono mb-0.5">SELECT MONITOR CHANNEL</label>
-                            <select id="station-select" tabindex="0" class="tv-focusable w-full bg-slate-900 border border-slate-700 text-white font-mono text-[10px] rounded p-1 focus:border-neonCyan focus:outline-none truncate">
-                                <option value="14200000">VP8 Falklands SDR Monitor (14.200 MHz USB)</option>
-                                <option value="7074000">FT8 Global Activity Hub (7.074 MHz LSB)</option>
-                                <option value="28074000">10m Beacon & DX Spotter (28.074 MHz USB)</option>
-                                <option value="12095000">BBC World Service Shortwave (12.095 MHz AM)</option>
-                                <option value="10000000">WWV Time & Frequency Beacon (10.000 MHz AM)</option>
-                            </select>
+                <!-- MODULE 6: WEBSDR & BROADCAST RECEIVER DECK -->
+                <div id="panel-sdr" class="bg-tvCard border border-tvBorder rounded-xl p-2 shrink-0 shadow-2xl">
+                    <div class="flex items-center justify-between mb-1">
+                        <div class="flex items-center space-x-1.5">
+                            <i class="fa-solid fa-radio text-neonGreen text-sm"></i>
+                            <h2 class="font-orbitron font-bold text-xs text-white tracking-wide">WEBSDR RECEIVER DECK</h2>
+                        </div>
+                        <span id="audio-status-badge" class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 border border-slate-700">
+                            STANDBY
+                        </span>
+                    </div>
+
+                    <div class="bg-tvDark border border-slate-800 rounded-lg p-2">
+                        <div class="flex items-center justify-between gap-2 mb-1.5">
+                            <div class="flex-1 min-w-0">
+                                <label class="block text-[8px] text-slate-400 font-mono mb-0.5">MONITOR FREQUENCY</label>
+                                <select id="station-select" tabindex="0" class="tv-focusable w-full bg-slate-900 border border-slate-700 text-white font-mono text-[10px] rounded p-1 focus:border-neonCyan focus:outline-none truncate">
+                                    <option value="14200000">VP8 Falklands SDR Monitor (14.200 MHz USB)</option>
+                                    <option value="7074000">FT8 Global Activity Hub (7.074 MHz LSB)</option>
+                                    <option value="28074000">10m Beacon & DX Spotter (28.074 MHz USB)</option>
+                                    <option value="12095000">BBC World Service Shortwave (12.095 MHz AM)</option>
+                                    <option value="10000000">WWV Time & Frequency Beacon (10.000 MHz AM)</option>
+                                </select>
+                            </div>
+
+                            <div class="text-right bg-slate-950 p-1 rounded border border-slate-800 shrink-0">
+                                <div class="text-[8px] text-slate-500 font-mono">FREQ</div>
+                                <div id="freq-display" class="text-xs font-black font-mono text-neonCyan glow-cyan">
+                                    14.200 <span class="text-[8px] text-slate-400">MHz</span>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="text-right bg-slate-950 p-1 rounded border border-slate-800 shrink-0">
-                            <div class="text-[8px] text-slate-500 font-mono">FREQUENCY</div>
-                            <div id="freq-display" class="text-sm font-black font-mono text-neonCyan glow-cyan">
-                                14.200 <span class="text-[9px] text-slate-400">MHz</span>
+                        <div class="grid grid-cols-12 gap-2 items-center">
+                            <button id="btn-audio-play" tabindex="0" class="tv-focusable col-span-5 bg-neonGreen hover:bg-emerald-400 text-black font-bold font-orbitron py-1 px-2 rounded flex items-center justify-center space-x-1 transition text-[10px]">
+                                <i class="fa-solid fa-play"></i>
+                                <span>TUNE IN</span>
+                            </button>
+
+                            <div class="col-span-7 flex items-center space-x-1.5 bg-slate-900/60 p-1 rounded border border-slate-800">
+                                <i class="fa-solid fa-volume-high text-slate-400 text-[10px]"></i>
+                                <input id="volume-slider" tabindex="0" type="range" min="0" max="1" step="0.05" value="0.5" class="tv-focusable w-full accent-neonCyan h-1.5 bg-slate-700 rounded cursor-pointer">
+                                <canvas id="visualizer-canvas" class="w-12 h-4 bg-slate-950 rounded border border-slate-800 shrink-0"></canvas>
                             </div>
                         </div>
                     </div>
-
-                    <div class="grid grid-cols-12 gap-2 items-center">
-                        <button id="btn-audio-play" tabindex="0" class="tv-focusable col-span-5 bg-neonGreen hover:bg-emerald-400 text-black font-bold font-orbitron py-1 px-2 rounded flex items-center justify-center space-x-1 transition text-[10px]">
-                            <i class="fa-solid fa-play"></i>
-                            <span>TUNE IN</span>
-                        </button>
-
-                        <div class="col-span-7 flex items-center space-x-2 bg-slate-900/60 p-1 rounded border border-slate-800">
-                            <i class="fa-solid fa-volume-high text-slate-400 text-[10px]"></i>
-                            <input id="volume-slider" tabindex="0" type="range" min="0" max="1" step="0.05" value="0.5" class="tv-focusable w-full accent-neonCyan h-1.5 bg-slate-700 rounded cursor-pointer">
-                            <canvas id="visualizer-canvas" class="w-16 h-5 bg-slate-950 rounded border border-slate-800 shrink-0"></canvas>
-                        </div>
-                    </div>
                 </div>
+
+            </section>
+
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="bg-tvCard border border-tvBorder rounded-lg px-2 py-0.5 flex items-center justify-between text-[9px] font-mono text-slate-400 shrink-0">
+            <div class="flex items-center space-x-2">
+                <span class="text-neonCyan"><i class="fa-solid fa-satellite mr-1"></i> IONO-ENGINE: ONLINE</span>
+                <span>|</span>
+                <span>LAT: 51.79° S, LON: 59.52° W</span>
             </div>
+            <div>
+                <span class="bg-slate-800 text-slate-300 px-1.5 py-0.2 rounded border border-slate-700">Modular TV Dashboard v2.5</span>
+            </div>
+        </footer>
 
-        </section>
-
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="bg-tvCard border border-tvBorder rounded-lg px-2.5 py-1 flex items-center justify-between text-[10px] font-mono text-slate-400 shrink-0 mt-0.5">
-        <div class="flex items-center space-x-3">
-            <span class="text-neonCyan"><i class="fa-solid fa-satellite mr-1"></i> IONOSPHERE ENGINE: ONLINE</span>
-            <span>|</span>
-            <span>QTH: 51.79° S, 59.52° W</span>
-            <span>|</span>
-            <span>Grid: GD18e</span>
-        </div>
-        <div class="flex items-center space-x-2">
-            <span class="bg-slate-800 text-slate-300 px-1.5 py-0.2 rounded border border-slate-700">Fire TV D-Pad Active</span>
-        </div>
-    </footer>
+    </div>
 
     <!-- SCRIPT ENGINE -->
     <script>
-        // Fullscreen Toggle for Fire TV Silk Browser
+        // 1. OVERSCAN & UI DISPLAY SCALER
+        const scaler = document.getElementById('app-scaler');
+        const scaleSelect = document.getElementById('scale-select');
+        
+        scaleSelect.addEventListener('change', (e) => {
+            const val = parseFloat(e.target.value);
+            scaler.style.transform = `scale(${val})`;
+            scaler.style.width = `${100 / val}%`;
+            scaler.style.height = `${100 / val}%`;
+            if (typeof onGlobeResize === 'function') setTimeout(onGlobeResize, 200);
+        });
+        // Initial scale trigger
+        scaleSelect.dispatchEvent(new Event('change'));
+
+        // Fullscreen Toggle
         document.getElementById('btn-fullscreen').addEventListener('click', () => {
             if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen().catch(()=>{});
@@ -373,7 +434,113 @@
             }
         });
 
-        // 1. HIGH PRECISION DUAL CLOCK ENGINE
+        // 2. MODULAR PANEL TOGGLE SYSTEM & PRESETS
+        const panelMap = {
+            qth: document.getElementById('panel-qth'),
+            clock: document.getElementById('panel-clock'),
+            solar: document.getElementById('panel-solar'),
+            globe: document.getElementById('panel-globe'),
+            bands: document.getElementById('panel-bands'),
+            sdr: document.getElementById('panel-sdr')
+        };
+
+        const toggleBtns = {
+            qth: document.getElementById('toggle-qth'),
+            clock: document.getElementById('toggle-clock'),
+            solar: document.getElementById('toggle-solar'),
+            globe: document.getElementById('toggle-globe'),
+            bands: document.getElementById('toggle-bands'),
+            sdr: document.getElementById('toggle-sdr')
+        };
+
+        function setPanelVisibility(panelKey, visible) {
+            const panel = panelMap[panelKey];
+            const btn = toggleBtns[panelKey];
+            if (!panel || !btn) return;
+
+            if (visible) {
+                panel.classList.remove('hidden');
+                btn.classList.add('btn-toggle-active');
+            } else {
+                panel.classList.add('hidden');
+                btn.classList.remove('btn-toggle-active');
+            }
+
+            // Reflow top row if QTH/Clock hidden
+            const qthVis = !panelMap.qth.classList.contains('hidden');
+            const clockVis = !panelMap.clock.classList.contains('hidden');
+            
+            if (!qthVis && clockVis) {
+                panelMap.clock.className = "col-span-12 bg-tvCard border border-tvBorder rounded-xl p-1.5 shadow-xl flex items-center justify-between gap-2";
+            } else if (qthVis && !clockVis) {
+                panelMap.qth.className = "col-span-12 bg-tvCard border border-tvBorder rounded-xl p-2 flex items-center justify-between shadow-xl min-w-0";
+            } else if (qthVis && clockVis) {
+                panelMap.qth.className = "col-span-3 bg-tvCard border border-tvBorder rounded-xl p-2 flex items-center justify-between shadow-xl min-w-0";
+                panelMap.clock.className = "col-span-9 bg-tvCard border border-tvBorder rounded-xl p-1.5 shadow-xl flex items-center justify-between gap-2";
+            }
+
+            // Reflow Main Content Grid
+            const globeVis = !panelMap.globe.classList.contains('hidden');
+            const bandsVis = !panelMap.bands.classList.contains('hidden');
+            const sdrVis = !panelMap.sdr.classList.contains('hidden');
+            const rightCol = document.getElementById('panel-right-col');
+
+            if (!bandsVis && !sdrVis) {
+                rightCol.classList.add('hidden');
+                if (globeVis) panelMap.globe.className = "col-span-12 bg-tvCard border border-tvBorder rounded-xl p-2 flex flex-col justify-between relative overflow-hidden min-h-0 shadow-2xl";
+            } else if (!globeVis) {
+                rightCol.className = "col-span-12 flex flex-col space-y-2 min-h-0";
+                rightCol.classList.remove('hidden');
+            } else {
+                panelMap.globe.className = "col-span-7 bg-tvCard border border-tvBorder rounded-xl p-2 flex flex-col justify-between relative overflow-hidden min-h-0 shadow-2xl";
+                rightCol.className = "col-span-5 flex flex-col space-y-2 min-h-0";
+                rightCol.classList.remove('hidden');
+            }
+
+            if (typeof onGlobeResize === 'function') setTimeout(onGlobeResize, 150);
+        }
+
+        Object.keys(toggleBtns).forEach(key => {
+            toggleBtns[key].addEventListener('click', () => {
+                const isVis = !panelMap[key].classList.contains('hidden');
+                setPanelVisibility(key, !isVis);
+            });
+        });
+
+        // PRESETS
+        document.getElementById('preset-full').addEventListener('click', function() {
+            Object.keys(panelMap).forEach(k => setPanelVisibility(k, true));
+            setActivePresetBtn(this);
+        });
+
+        document.getElementById('preset-globe').addEventListener('click', function() {
+            setPanelVisibility('qth', true);
+            setPanelVisibility('clock', true);
+            setPanelVisibility('solar', false);
+            setPanelVisibility('globe', true);
+            setPanelVisibility('bands', false);
+            setPanelVisibility('sdr', false);
+            setActivePresetBtn(this);
+        });
+
+        document.getElementById('preset-monitors').addEventListener('click', function() {
+            setPanelVisibility('qth', true);
+            setPanelVisibility('clock', true);
+            setPanelVisibility('solar', true);
+            setPanelVisibility('globe', false);
+            setPanelVisibility('bands', true);
+            setPanelVisibility('sdr', true);
+            setActivePresetBtn(this);
+        });
+
+        function setActivePresetBtn(btn) {
+            ['preset-full', 'preset-globe', 'preset-monitors'].forEach(id => {
+                document.getElementById(id).className = "tv-focusable px-2 py-0.5 rounded text-[10px] font-mono text-slate-300 hover:text-white transition";
+            });
+            btn.className = "tv-focusable px-2 py-0.5 rounded text-[10px] font-mono btn-toggle-active transition";
+        }
+
+        // 3. CLOCK ENGINE
         function updateClocks() {
             const now = new Date();
 
@@ -383,7 +550,7 @@
             const utcSeconds = String(now.getUTCSeconds()).padStart(2, '0');
             const utcMillis = String(now.getUTCMilliseconds()).padStart(3, '0');
             document.getElementById('clock-utc').innerHTML = 
-                `${utcHours}:${utcMinutes}:${utcSeconds}.<span class="text-xl text-neonGreen/80">${utcMillis}</span>`;
+                `${utcHours}:${utcMinutes}:${utcSeconds}.<span class="text-sm text-neonGreen/80">${utcMillis}</span>`;
             document.getElementById('date-utc').textContent = now.toISOString().split('T')[0];
 
             // FKST Local (UTC-3)
@@ -395,7 +562,7 @@
             const fkstMillis = String(fkstTime.getMilliseconds()).padStart(3, '0');
 
             document.getElementById('clock-fkst').innerHTML = 
-                `${fkstHours}:${fkstMinutes}:${fkstSeconds}.<span class="text-xl text-neonCyan/80">${fkstMillis}</span>`;
+                `${fkstHours}:${fkstMinutes}:${fkstSeconds}.<span class="text-sm text-neonCyan/80">${fkstMillis}</span>`;
             document.getElementById('date-fkst').textContent = 
                 `${fkstTime.getFullYear()}-${String(fkstTime.getMonth()+1).padStart(2,'0')}-${String(fkstTime.getDate()).padStart(2,'0')}`;
 
@@ -403,23 +570,28 @@
             const solarPhaseEl = document.getElementById('solar-phase');
             if (hour >= 5 && hour < 21) {
                 solarPhaseEl.textContent = "Daylight Phase";
-                solarPhaseEl.className = "text-neonAmber font-bold mt-0.5";
+                solarPhaseEl.className = "text-neonAmber font-bold";
             } else {
                 solarPhaseEl.textContent = "Night Time Phase";
-                solarPhaseEl.className = "text-neonCyan font-bold mt-0.5";
+                solarPhaseEl.className = "text-neonCyan font-bold";
             }
 
             requestAnimationFrame(updateClocks);
         }
         requestAnimationFrame(updateClocks);
 
-        // 2. SOUTHERN HEMISPHERE BAND PROPAGATION ENGINE
+        // 4. BAND PROPAGATION ENGINE
         const HF_BANDS = [
-            { name: "160m", freq: "1.8 MHz" }, { name: "80m", freq: "3.5 MHz" },
-            { name: "40m", freq: "7.0 MHz" }, { name: "30m", freq: "10.1 MHz" },
-            { name: "20m", freq: "14.0 MHz" }, { name: "17m", freq: "18.1 MHz" },
-            { name: "15m", freq: "21.0 MHz" }, { name: "12m", freq: "24.9 MHz" },
-            { name: "10m", freq: "28.0 MHz" }, { name: "6m", freq: "50.0 MHz" }
+            { name: "160m", freq: "1.8 MHz", status: "OPEN", cond: "Night DX", color: "neonGreen" },
+            { name: "80m", freq: "3.5 MHz", status: "OPEN", cond: "Good Regional", color: "neonGreen" },
+            { name: "40m", freq: "7.0 MHz", status: "OPEN", cond: "Excellent DX", color: "neonGreen" },
+            { name: "30m", freq: "10.1 MHz", status: "OPEN", cond: "Stable Paths", color: "neonGreen" },
+            { name: "20m", freq: "14.0 MHz", status: "PRIME", cond: "Worldwide DX", color: "neonCyan" },
+            { name: "17m", freq: "18.1 MHz", status: "OPEN", cond: "Good Daylight", color: "neonGreen" },
+            { name: "15m", freq: "21.0 MHz", status: "OPEN", cond: "High Flux DX", color: "neonGreen" },
+            { name: "12m", freq: "24.9 MHz", status: "FAIR", cond: "Intermittent", color: "neonAmber" },
+            { name: "10m", freq: "28.0 MHz", status: "FAIR", cond: "Solar Dependent", color: "neonAmber" },
+            { name: "6m", freq: "50.0 MHz", status: "CLOSED", cond: "No Sporadic-E", color: "slate-500" }
         ];
 
         function renderBands() {
@@ -427,54 +599,172 @@
             container.innerHTML = '';
             HF_BANDS.forEach(b => {
                 const card = document.createElement('div');
-                card.className = "bg-tvDark border border-slate-800 rounded-xl p-2 flex items-center justify-between";
+                card.className = "bg-tvDark border border-slate-800 rounded-lg p-1.5 flex items-center justify-between";
+                
+                let badgeClass = "bg-neonGreen/20 text-neonGreen border-neonGreen/40";
+                if (b.status === "PRIME") badgeClass = "bg-neonCyan/20 text-neonCyan border-neonCyan/40 animate-pulse";
+                if (b.status === "FAIR") badgeClass = "bg-neonAmber/20 text-neonAmber border-neonAmber/40";
+                if (b.status === "CLOSED") badgeClass = "bg-slate-800 text-slate-500 border-slate-700";
+
                 card.innerHTML = `
                     <div>
-                        <div class="flex items-center space-x-2">
-                            <span class="font-black text-sm font-orbitron text-white">${b.name}</span>
-                            <span class="text-[10px] text-slate-400 font-mono">${b.freq}</span>
-        // 3. THREE.JS GLOBE ENGINE WITH AUTO-RESIZING
-        let scene, camera, renderer, globeGroup, autoSpin = true;
+                        <div class="flex items-center space-x-1.5">
+                            <span class="font-black text-xs font-orbitron text-white">${b.name}</span>
+                            <span class="text-[9px] text-slate-400 font-mono">${b.freq}</span>
+                        </div>
+                        <div class="text-[8px] text-slate-400 font-mono">${b.cond}</div>
+                    </div>
+                    <span class="px-1.5 py-0.5 rounded text-[8px] font-bold font-orbitron border ${badgeClass}">
+                        ${b.status}
+                    </span>
+                `;
+                container.appendChild(card);
+            });
+        }
+        renderBands();
+
+        // 5. THREE.JS 3D GLOBE WITH CONTINENTAL OUTLINES
+        let scene, camera, renderer, globeGroup, autoSpin = true, onGlobeResize;
+
+        // Procedural Continental Texture Generator
+        function createLandmassTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            // Ocean Background
+            ctx.fillStyle = '#060d1a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Grid lines
+            ctx.strokeStyle = '#101f38';
+            ctx.lineWidth = 1;
+            for (let x = 0; x < canvas.width; x += 64) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+            }
+            for (let y = 0; y < canvas.height; y += 64) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+            }
+
+            // Draw Continents (Simplified Vector Shapes)
+            ctx.fillStyle = '#1e293b';
+            ctx.strokeStyle = '#00f0ff';
+            ctx.lineWidth = 1.5;
+
+            function drawContinent(points) {
+                ctx.beginPath();
+                points.forEach((pt, idx) => {
+                    const x = (pt[0] / 360 + 0.5) * canvas.width;
+                    const y = (-pt[1] / 180 + 0.5) * canvas.height;
+                    if (idx === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                });
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            }
+
+            // South America
+            drawContinent([[-80,10], [-35,-5], [-40,-20], [-65,-55], [-75,-45], [-80,-20]]);
+            // North America
+            drawContinent([[-160,70], [-100,75], [-60,50], [-80,25], [-100,20], [-120,35], [-160,60]]);
+            // Europe & Asia
+            drawContinent([[-10,35], [40,40], [30,70], [170,70], [140,35], [100,10], [60,25], [30,30]]);
+            // Africa
+            drawContinent([[-15,35], [50,30], [40,-35], [15,-35], [-15,5]]);
+            // Australia
+            drawContinent([[110,-10], [155,-10], [150,-40], [115,-35]]);
+            // Antarctica
+            drawContinent([[-180,-70], [180,-70], [180,-90], [-180,-90]]);
+
+            return new THREE.CanvasTexture(canvas);
+        }
+
         function initGlobe() {
             const container = document.getElementById('globe-container');
+            if (!container) return;
+
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-            camera.position.z = 180;
+            camera.position.z = 175;
 
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(container.clientWidth, container.clientHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             container.appendChild(renderer.domElement);
 
             globeGroup = new THREE.Group();
             scene.add(globeGroup);
 
-            // Sphere
-            const sphere = new THREE.Mesh(
-                new THREE.SphereGeometry(50, 32, 32),
-                new THREE.MeshBasicMaterial({ color: 0x0a1526, wireframe: false })
-            );
-            globeGroup.add(sphere);
+            // Textured Earth Sphere
+            const texture = createLandmassTexture();
+            const sphereGeo = new THREE.SphereGeometry(50, 48, 48);
+            const sphereMat = new THREE.MeshBasicMaterial({ map: texture });
+            const earth = new THREE.Mesh(sphereGeo, sphereMat);
+            globeGroup.add(earth);
 
-            const wire = new THREE.Mesh(
-                new THREE.SphereGeometry(50.2, 24, 20),
-                new THREE.MeshBasicMaterial({ color: 0x1e293b, wireframe: true, transparent: true, opacity: 0.4 })
-            );
-            globeGroup.add(wire);
+            // Atmosphere Glow
+            const atmosGeo = new THREE.SphereGeometry(52, 32, 32);
+            const atmosMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.1, side: THREE.BackSide });
+            const atmosphere = new THREE.Mesh(atmosGeo, atmosMat);
+            globeGroup.add(atmosphere);
 
-            function onResize() {
+            // VP8 Falklands Pin (51.79° S, 59.52° W)
+            function latLonToVector(lat, lon, radius) {
+                const phi = (90 - lat) * (Math.PI / 180);
+                const theta = (lon + 180) * (Math.PI / 180);
+                return new THREE.Vector3(
+                    -(radius * Math.sin(phi) * Math.cos(theta)),
+                    radius * Math.cos(phi),
+                    radius * Math.sin(phi) * Math.sin(theta)
+                );
+            }
+
+            const vp8Pos = latLonToVector(-51.79, -59.52, 50.5);
+            const pinGeo = new THREE.SphereGeometry(1.8, 16, 16);
+            const pinMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff });
+            const pin = new THREE.Mesh(pinGeo, pinMat);
+            pin.position.copy(vp8Pos);
+            globeGroup.add(pin);
+
+            // Glowing Arc Paths to DX Hubs
+            const dxHubs = [
+                { name: "Europe", lat: 50, lon: 10 },
+                { name: "North America", lat: 40, lon: -95 },
+                { name: "Japan", lat: 36, lon: 138 }
+            ];
+
+            dxHubs.forEach(hub => {
+                const targetPos = latLonToVector(hub.lat, hub.lon, 50.5);
+                const mid = vp8Pos.clone().add(targetPos).multiplyScalar(0.5).normalize().multiplyScalar(68);
+                const curve = new THREE.QuadraticBezierCurve3(vp8Pos, mid, targetPos);
+                const points = curve.getPoints(30);
+                const arcGeo = new THREE.BufferGeometry().setFromPoints(points);
+                const arcMat = new THREE.LineBasicMaterial({ color: 0x00ff66, transparent: true, opacity: 0.85 });
+                const line = new THREE.Line(arcGeo, arcMat);
+                globeGroup.add(line);
+            });
+
+            // Initial view angle towards South America
+            globeGroup.rotation.x = 0.5;
+            globeGroup.rotation.y = -1.2;
+
+            onGlobeResize = function() {
                 if (!container || !renderer || !camera) return;
                 const w = container.clientWidth;
                 const h = container.clientHeight;
+                if (w === 0 || h === 0) return;
                 camera.aspect = w / h;
                 camera.updateProjectionMatrix();
                 renderer.setSize(w, h);
-            }
-            window.addEventListener('resize', onResize);
+            };
+
+            window.addEventListener('resize', onGlobeResize);
 
             function animate() {
                 requestAnimationFrame(animate);
-                if (autoSpin) globeGroup.rotation.y += 0.0025;
+                if (autoSpin) globeGroup.rotation.y += 0.002;
                 renderer.render(scene, camera);
             }
             animate();
@@ -483,53 +773,98 @@
                 autoSpin = !autoSpin;
                 document.getElementById('btn-spin-toggle').innerHTML = `<i class="fa-solid fa-rotate mr-1"></i> Spin: ${autoSpin?'ON':'OFF'}`;
             });
+
             document.getElementById('btn-reset-cam').addEventListener('click', () => {
-                globeGroup.rotation.set(0.4, -1.2, 0);
+                globeGroup.rotation.set(0.5, -1.2, 0);
             });
         }
         window.addEventListener('load', initGlobe);
 
-        // 4. FIRE TV REMOTE D-PAD NAVIGATION ENGINE
-        const focusables = Array.from(document.querySelectorAll('.tv-focusable'));
-        let currentFocusIndex = 0;
+        // 6. FIRE TV REMOTE D-PAD SPATIAL NAVIGATION
+        let focusables = [];
+        let currentFocusIdx = 0;
 
-        function setFocus(index) {
-            if (index < 0) index = 0;
-            if (index >= focusables.length) index = focusables.length - 1;
-            currentFocusIndex = index;
-            focusables[currentFocusIndex].focus();
+        function refreshFocusables() {
+            focusables = Array.from(document.querySelectorAll('.tv-focusable')).filter(el => {
+                return el.offsetWidth > 0 && el.offsetHeight > 0 && !el.closest('.hidden');
+            });
+            if (currentFocusIdx >= focusables.length) currentFocusIdx = 0;
+        }
+
+        function setFocus(idx) {
+            refreshFocusables();
+            if (focusables.length === 0) return;
+            if (idx < 0) idx = 0;
+            if (idx >= focusables.length) idx = focusables.length - 1;
+            
+            focusables.forEach(f => f.classList.remove('tv-focused'));
+            currentFocusIdx = idx;
+            focusables[currentFocusIdx].focus();
+            focusables[currentFocusIdx].classList.add('tv-focused');
         }
 
         window.addEventListener('keydown', (e) => {
-            // TV Remote KeyCodes: 37 (Left), 38 (Up), 39 (Right), 40 (Down), 13 (Select)
+            // TV Remote D-Pad Keycodes
             if ([37, 38, 39, 40].includes(e.keyCode)) {
                 e.preventDefault();
                 if (e.keyCode === 39 || e.keyCode === 40) {
-                    setFocus(currentFocusIndex + 1);
+                    setFocus(currentFocusIdx + 1);
                 } else if (e.keyCode === 37 || e.keyCode === 38) {
-                    setFocus(currentFocusIndex - 1);
+                    setFocus(currentFocusIdx - 1);
                 }
             }
         });
 
-        // SDR Audio Generator
-        let audioCtx, osc;
-        document.getElementById('btn-audio-play').addEventListener('click', () => {
+        // 7. WEBSDR RECEIVER DECK AUDIO SYNTHESIZER
+        let audioCtx, osc, gainNode;
+        const stationSelect = document.getElementById('station-select');
+        const freqDisplay = document.getElementById('freq-display');
+        const playBtn = document.getElementById('btn-audio-play');
+
+        stationSelect.addEventListener('change', (e) => {
+            const freqMHz = (parseFloat(e.target.value) / 1000000).toFixed(3);
+            freqDisplay.innerHTML = `${freqMHz} <span class="text-[8px] text-slate-400">MHz</span>`;
+        });
+
+        playBtn.addEventListener('click', () => {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
             if (osc) {
                 osc.stop();
                 osc = null;
-                document.getElementById('btn-audio-play').innerHTML = `<i class="fa-solid fa-play"></i> <span>TUNE IN</span>`;
+                playBtn.innerHTML = `<i class="fa-solid fa-play"></i> <span>TUNE IN</span>`;
+                playBtn.className = "tv-focusable col-span-5 bg-neonGreen hover:bg-emerald-400 text-black font-bold font-orbitron py-1 px-2 rounded flex items-center justify-center space-x-1 transition text-[10px]";
                 document.getElementById('audio-status-badge').textContent = "STANDBY";
+                document.getElementById('audio-status-badge').className = "text-[9px] font-mono px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 border border-slate-700";
             } else {
                 osc = audioCtx.createOscillator();
-                osc.connect(audioCtx.destination);
+                gainNode = audioCtx.createGain();
+                
+                const vol = parseFloat(document.getElementById('volume-slider').value);
+                gainNode.gain.setValueAtTime(vol * 0.1, audioCtx.currentTime);
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(700, audioCtx.currentTime); // Standard CW/USB sidetone
+                
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
                 osc.start();
-                document.getElementById('btn-audio-play').innerHTML = `<i class="fa-solid fa-square"></i> <span>STOP</span>`;
+
+                playBtn.innerHTML = `<i class="fa-solid fa-square"></i> <span>STOP</span>`;
+                playBtn.className = "tv-focusable col-span-5 bg-neonRed text-white font-bold font-orbitron py-1 px-2 rounded flex items-center justify-center space-x-1 transition text-[10px]";
                 document.getElementById('audio-status-badge').textContent = "LIVE RECEIVE";
+                document.getElementById('audio-status-badge').className = "text-[9px] font-mono px-1.5 py-0.2 rounded bg-neonGreen/20 text-neonGreen border border-neonGreen/40 animate-pulse";
             }
         });
+
+        document.getElementById('volume-slider').addEventListener('input', (e) => {
+            if (gainNode && audioCtx) {
+                gainNode.gain.setValueAtTime(parseFloat(e.target.value) * 0.1, audioCtx.currentTime);
+            }
+        });
+
+        // Initialize focus state
+        setTimeout(() => setFocus(0), 500);
     </script>
 </body>
 </html>
-```
